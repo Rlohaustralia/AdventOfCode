@@ -1,3 +1,5 @@
+package Day1;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -14,7 +16,7 @@ public class Main {
         // Part 1
 
         try {
-            BufferedReader br = new BufferedReader (new FileReader("Day1/input.txt"));
+            BufferedReader br = new BufferedReader (new FileReader("src/Day1/input.txt"));
 
             List<Integer> firstList = new ArrayList<>();
             List<Integer> secondList = new ArrayList<>();
