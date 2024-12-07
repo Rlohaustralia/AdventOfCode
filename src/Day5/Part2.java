@@ -58,7 +58,6 @@ public class Part2 {
         System.out.println("Middle Sum: " + middleSum);
     }
 
-
     private static int calculateMiddleSum(Map<String, List<String>> rulesMap, String[][] updateArray) {
         int middleSum = 0;
         for (String[] update : updateArray) {
@@ -73,13 +72,14 @@ public class Part2 {
 
 
     private static String[] sortCorrectly(Map<String, List<String>> rulesMap, String[] update) {
+        // Topological Sort!
         // Step 1: Create a map to track the indegree of each item (dependencies)
         Map<String, Integer> indegree = new HashMap<>();
         Map<String, List<String>> adjacencyList = new HashMap<>();
 
         // Initialize adjacency list and indegree map for the topological sort
         for (String item : update) {
-            indegree.put(item, 0);
+            indegree.put(item,0);
             adjacencyList.put(item, new ArrayList<>());
         }
 
@@ -93,9 +93,10 @@ public class Part2 {
             }
         }
 
-        // Step 3: Perform Kahn's Algorithm (Topological Sort)
+        // Step 3: Perform Topological Sort (Using Queue)
         Queue<String> queue = new LinkedList<>();
         for (String item : update) {
+            // If there is no dependency, insert it to the queue
             if (indegree.get(item) == 0) {
                 queue.offer(item);
             }
@@ -106,6 +107,7 @@ public class Part2 {
             String current = queue.poll();
             sortedList.add(current);
 
+            // Subtract dependency -1 for the adjacency list of the current
             for (String neighbor : adjacencyList.get(current)) {
                 indegree.put(neighbor, indegree.get(neighbor) - 1);
                 if (indegree.get(neighbor) == 0) {
@@ -114,12 +116,16 @@ public class Part2 {
             }
         }
 
-        // If we could not sort all items, there was a cycle (invalid update)
+        // If we could not sort all items, there was cycle (invalid update)
+        // In the topological sort algorithm, there should be a start and an end element.
         if (sortedList.size() != update.length) {
             throw new IllegalStateException("Cycle detected, invalid update.");
         }
 
         // Step 4: Return the sorted array
+        // Creating an empty array of String and convert the list to an array
+        // We can do 'new String[sortedList.size()]' instead of 'new String[0]'
+        // but using new String[0] is a common practice because it’s concise, and Java efficiently handles resizing internally
         return sortedList.toArray(new String[0]);
     }
 
