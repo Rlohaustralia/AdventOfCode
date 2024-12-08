@@ -39,13 +39,13 @@ public class Part1 {
             if (found) break;
         }
 
-        // Directions (Up, Right, Down, Left)
-        int[] di = {-1, 0, 1, 0};  // Row directions for Up, Right, Down, Left
-        int[] dj = {0, 1, 0, -1};  // Column directions for Up, Right, Down, Left
-        int dir = 0; // Starting direction is Up
+        // Directions (North, East, South, West)
+        int[] di = {-1, 0, 1, 0};  // Row movement for directions
+        int[] dj = {0, 1, 0, -1};  // Column movement for directions
 
-        // Set to track distinct visited positions
+        // Track positions visited by the guard
         Set<String> seen = new HashSet<>();
+        int dir = 0; // Starting direction is North
 
         // Simulate the guard's movement
         while (true) {
@@ -57,9 +57,7 @@ public class Part1 {
             int next_j = j + dj[dir];
 
             // Check if the next position is out of bounds
-            if (!(0 <= next_i && next_i < n && 0 <= next_j && next_j < m)) {
-                break;
-            }
+            if (!(0 <= next_i && next_i < n && 0 <= next_j && next_j < m)) break;
 
             // Check if the next position is an obstacle
             if (grid[next_i].charAt(next_j) == '#') {

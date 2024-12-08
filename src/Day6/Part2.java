@@ -12,71 +12,127 @@ public class Part2 {
         BufferedReader br = new BufferedReader(new FileReader("src/Day6/input.txt"));
         String line;
 
-        // Create a list to save the grid
+        // Create a grid from input file
         StringBuilder gridBuilder = new StringBuilder();
         while ((line = br.readLine()) != null) {
             gridBuilder.append(line).append("\n");
         }
         br.close();
 
-        // Convert the grid into a 2D array (n x m matrix)
+        // Convert grid into 2D array
         String[] grid = gridBuilder.toString().split("\n");
-        int n = grid.length;
-        int m = grid[0].length();
+        int rows = grid.length;
+        int cols = grid[0].length();
 
-        // Find the starting position of the guard
-        int i = -1, j = -1;
-        boolean found = false;
-        for (int row = 0; row < n; row++) {
-            for (int col = 0; col < m; col++) {
-                if (grid[row].charAt(col) == '^') {
-                    i = row;
-                    j = col;
-                    found = true;
+        // Find initial position of the guard
+        int guardX = -1, guardY = -1;
+        boolean foundGuard = false;
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                if (grid[r].charAt(c) == '^') {
+                    guardX = r;
+                    guardY = c;
+                    foundGuard = true;
                     break;
                 }
             }
-            if (found) break;
+            if (foundGuard) break;
         }
 
-        // Directions (Up, Right, Down, Left)
-        int[] di = {-1, 0, 1, 0};  // Row directions for Up, Right, Down, Left
-        int[] dj = {0, 1, 0, -1};  // Column directions for Up, Right, Down, Left
-        int dir = 0; // Starting direction is Up
+        // Directions (North, East, South, West)
+        int[] moveRow = {-1, 0, 1, 0};  // Row movement for directions
+        int[] moveCol = {0, 1, 0, -1};  // Column movement for directions
 
-        // Set to track distinct visited positions
-        Set<String> seen = new HashSet<>();
+        // Track positions visited by the guard
+        Set<String> visitedPositions = new HashSet<>();
+        int direction = 0; // Start direction is North
+        int currentX = guardX, currentY = guardY;
 
-        // Simulate the guard's movement
+        // Simulate guard's initial movement
         while (true) {
-            // Mark the current position as visited
-            seen.add(i + "," + j);
+            visitedPositions.add(currentX + "," + currentY);
 
-            // Calculate next position
-            int next_i = i + di[dir];
-            int next_j = j + dj[dir];
+            int nextX = currentX + moveRow[direction];
+            int nextY = currentY + moveCol[direction];
 
-            // Check if the next position is out of bounds
-            if (!(0 <= next_i && next_i < n && 0 <= next_j && next_j < m)) {
-                break;
-            }
-
-            // Check if the next position is an obstacle
-            if (grid[next_i].charAt(next_j) == '#') {
-                // Change direction: turn right (clockwise)
-                if (dir == 3) {
-                    dir = 0; // Turn from Left (3) back to Up (0)
+            if (!(0 <= nextX && nextX < rows && 0 <= nextY && nextY < cols)) break;
+            if (grid[nextX].charAt(nextY) == '#') {
+                if (direction == 3) {
+                    direction = 0;
                 } else {
-                    dir++; // Move to the next direction (Up -> Right -> Down -> Left)
+                    direction++;
                 }
             } else {
-                // Move to the next position if no obstacle
-                i = next_i;
-                j = next_j;
+                currentX = nextX;
+                currentY = nextY;
             }
         }
 
-        // Output the number of distinct positions visited
-        System.out.println(seen.size());
+        // Count positions that cause infinite loops
+        int infiniteLoopCount = 0;
+        for (String position : visitedPositions) {
+            String[] coordinates = position.split(",");
+            int obstacleX = Integer.parseInt(coordinates[0]);
+            int obstacleY = Integer.parseInt(coordinates[1]);
+
+            // Skip guard's starting position
+            if (obstacleX == guardX && obstacleY == guardY) continue;
+
+            // Check if placing an obstacle here causes a loop
+            if (causesInfiniteLoop(grid, guardX, guardY, rows, cols, obstacleX, obstacleY)) {
+                infiniteLoopCount++;
+            }
+        }
+
+        System.out.println(infiniteLoopCount);
+    }
+
+    private static boolean causesInfiniteLoop(String[] grid, int startX, int startY, int rows, int cols, int obstacleX, int obstacleY) {
+        // Temporarily place an obstacle
+        char[] row = grid[obstacleX].toCharArray();
+        if (row[obstacleY] == '#') return false; // Already an obstacle
+
+        row[obstacleY] = '#'; // Place obstacle
+        grid[obstacleX] = String.valueOf(row);
+
+        int[] moveRow = {-1, 0, 1, 0};
+        int[] moveCol = {0, 1, 0, -1};
+        Set<String> stateHistory = new HashSet<>();
+        int direction = 0;
+        int currentX = startX, currentY = startY;
+
+        // Simulate guard's movement with the new obstacle
+        while (true) {
+            String state = currentX + "," + currentY + "," + direction;
+            if (stateHistory.contains(state)) {
+                // Remove obstacle and return true (loop detected)
+                row[obstacleY] = '.';
+                grid[obstacleX] = String.valueOf(row);
+                return true;
+            }
+
+            stateHistory.add(state);
+
+            int nextX = currentX + moveRow[direction];
+            int nextY = currentY + moveCol[direction];
+
+            if (!(0 <= nextX && nextX < rows && 0 <= nextY && nextY < cols)) {
+                // Remove obstacle and return false (no loop detected)
+                row[obstacleY] = '.';
+                grid[obstacleX] = String.valueOf(row);
+                return false;
+            }
+
+            if (grid[nextX].charAt(nextY) == '#') {
+                if (direction == 3) {
+                    direction = 0;
+                } else {
+                    direction++;
+                }
+            } else {
+                currentX = nextX;
+                currentY = nextY;
+            }
+        }
     }
 }
