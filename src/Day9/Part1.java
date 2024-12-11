@@ -16,6 +16,10 @@ public class Part1 {
 //            combinedString.append(test.charAt(i));
 //        }
 
+
+        // 하지만 Integer.parseInt()를 사용할 수도 있습니다. 다만, Integer.parseInt()는 문자열 전체를 정수로 변환하므로, 문자 하나를 변환하는 데는 약간의 오버헤드가 있을 수 있습니다.
+        // -'0' 문자열을 정수로 바꾸는????
+
         BufferedReader br = new BufferedReader(new FileReader("src/Day9/input.txt"));
         String line;
         StringBuilder combinedString = new StringBuilder();
