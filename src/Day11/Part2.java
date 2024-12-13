@@ -1,57 +1,61 @@
 package Day11;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.io.*;
+import java.util.*;
 
 public class Part2 {
+
     public static void main(String[] args) throws IOException {
+        // Read input file
         BufferedReader br = new BufferedReader(new FileReader("src/Day11/input.txt"));
-        String line;
+        String[] originalNums = br.readLine().trim().split(" ");
 
-        ArrayList<String> lists = new ArrayList<>();
-        while ((line = br.readLine()) != null) {
-            for (String num : line.split(" ")) {
-                lists.add(num.trim());
-            }
+        // Initialize the map to store number frequencies
+        Map<Long, Long> frequencyMap = new HashMap<>();
+        for (String num : originalNums) {
+            long n = Long.parseLong(num);
+            frequencyMap.put(n, frequencyMap.getOrDefault(n, 0L) + 1);
         }
 
-        int blink = 25;
-        int cycle = 1;
-        while (blink > 0) {
-            System.out.println("After " + cycle + " blink:");
-
-            for (int i = 0; i < lists.size(); i++) {
-                String str = lists.get(i);
-                int strLen = str.length();
-
-                if (str.equals("0")) {
-                    lists.set(i, "1");  // Change "0" to "1"
-                } else if (strLen % 2 == 0) {
-                    String left = str.substring(0, strLen / 2).replaceFirst("^0+", "");
-                    String right = str.substring(strLen / 2).replaceFirst("^0+", "");
-
-                    // Avoid adding empty strings or unnecessary zeros
-                    if (left.isEmpty()) left = "0";
-                    if (right.isEmpty()) right = "0";
-
-                    lists.set(i, left);  // Replace current element with left part
-                    lists.add(i + 1, right);  // Add right part at the next index
-                    i++;  // Skip the next index since it's already processed
-                } else {
-                    Long num = Long.parseLong(str) * 2024;
-                    String numStr = String.valueOf(num);
-                    lists.set(i, numStr);  // Replace the current element with the multiplied value
-                }
-
-                System.out.println("List contents: " + lists);
-            }
-
-            blink--;
-            cycle++;
+        // Do the blink process
+        int blink = 75;
+        for (int i = 0; i < blink; i++) {
+            frequencyMap = blink(frequencyMap);
         }
 
-        System.out.println(lists.size());
+        // Calculate the sum of all frequencies (the number of iterations)
+        long sum = 0;
+        for (long count : frequencyMap.values()) {
+            sum += count;
+        }
+
+        // Print the result
+        System.out.println("Answer is: " + sum);
+    }
+
+
+    private static Map<Long, Long> blink(Map<Long, Long> frequencyMap) {
+        Map<Long, Long> newFrequencyMap = new HashMap<>();
+
+        for (Map.Entry<Long, Long> entry : frequencyMap.entrySet()) {
+            long stone = entry.getKey();
+            long frequency = entry.getValue();
+            int len = String.valueOf(stone).length();
+
+            // 3 Conditions
+            if (stone == 0) {
+                newFrequencyMap.put(1L, newFrequencyMap.getOrDefault(1L, 0L) + frequency);
+            } else if (len % 2 == 0) {
+                String str = String.valueOf(stone);
+                long left = Long.parseLong(str.substring(0, len / 2));
+                long right = Long.parseLong(str.substring(len / 2));
+                newFrequencyMap.put(left, newFrequencyMap.getOrDefault(left, 0L) + frequency);
+                newFrequencyMap.put(right, newFrequencyMap.getOrDefault(right, 0L) + frequency);
+            } else {
+                long newValue = stone * 2024;
+                newFrequencyMap.put(newValue, newFrequencyMap.getOrDefault(newValue, 0L) + frequency);
+            }
+        }
+        return newFrequencyMap;
     }
 }
