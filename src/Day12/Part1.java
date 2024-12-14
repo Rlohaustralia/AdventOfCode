@@ -70,9 +70,9 @@ public class Part1 {
                 stack.add(new int[]{ni, nj});
             }
         }
-
         plots.add(currentPlot);
     }
+
 
     private static int calculatePerimeter(List<String> plot, int[][] directions, String[] grid) {
         int perimeter = 0;
