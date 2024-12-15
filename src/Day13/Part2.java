@@ -48,21 +48,19 @@ public class Part2 {
 
             // Prize data
             Map<String, Long> prize = new HashMap<>();
-
             prize.put("X", Long.parseLong(m.group(5)) + 10000000000000L);
             prize.put("Y", Long.parseLong(m.group(6)) + 10000000000000L);
             machine.put("Prize", prize);
-
 
             // Add machine data to the list
             machines.add(machine);
         }
 
         // Token costs for A and B buttons
-        int tokenA = 3;
-        int tokenB = 1;
+        long tokenA = 3;
+        long tokenB = 1;
 
-        int totalTokensUsed = 0;
+        long totalTokensUsed = 0;
 
         for (Map<String, Map<String, Long>> machine : machines) {
             Map<String, Long> buttonA = machine.get("Button A");
@@ -76,26 +74,39 @@ public class Part2 {
             long prize_X = prize.get("X");
             long prize_Y = prize.get("Y");
 
-            // Calculate the determinant of matrix A
-            long detA = buttonA_X * buttonB_Y - buttonA_Y * buttonB_X;
+            // Coefficient matrix determinant
+            long determinant = buttonA_X * buttonB_Y - buttonA_Y * buttonB_X;
 
-            // If the determinant is 0, the system has no unique solution
-            if (detA == 0) {
-                System.out.println("No unique solution for this machine.");
+            // Use Cramer's rule to find a and b
+            long determinantA = prize_X * buttonB_Y - prize_Y * buttonB_X; // Determinant for 'a'
+            long determinantB = buttonA_X * prize_Y - buttonA_Y * prize_X; // Determinant for 'b'
+            long a = determinantA / determinant;
+            long b = determinantB / determinant;
+
+
+            // Debugging
+            System.out.println("determinant: " + determinant);
+            System.out.println("determinantA: " + determinantA);
+            System.out.println("determinantB: " + determinantB);
+            System.out.println("a: " + determinantA / determinant);
+            System.out.println("b: " + determinantB / determinant);
+
+
+            // Check if a and b are integers
+            if (determinantA % determinant != 0 || determinantB % determinant != 0) {
+                continue; // Skip if not integers
+            }
+
+            // Skip if a or b are negative
+            if (a < 0 || b < 0) {
                 continue;
             }
 
-            // Calculate determinants for A1 and A2
-            long detA1 = prize_X * buttonB_Y - prize_Y * buttonB_X;
-            long detA2 = buttonA_X * prize_Y - buttonA_Y * prize_X;
-
-            // Calculate a and b using Cramer's rule
-            long a = detA1 / detA;
-            long b = detA2 / detA;
-
-            // Calculate the number of tokens used
-            int tokensUsed = (int) (tokenA * a + tokenB * b);
+            // Calculate total tokens used for this machine
+            long tokensUsed = tokenA * a + tokenB * b;
             totalTokensUsed += tokensUsed;
+            System.out.println("totalTokensUsed: " + totalTokensUsed);
+            System.out.println("---------------");
         }
 
         // Output results
