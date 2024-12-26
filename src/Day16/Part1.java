@@ -86,7 +86,6 @@ public class Part1 {
             // Case: Turn right
             heap.add(new int[]{score + 1000, (direction + 1) % 4, i, j});
 
-            heap.add(new int[]{score + 1000, (direction + 1) % 4, i, j});
             // Case: Turn left
             heap.add(new int[]{score + 1000, (direction + 3) % 4, i, j});
         }

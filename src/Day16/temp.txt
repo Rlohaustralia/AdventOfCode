@@ -1,10 +1,4 @@
-package Day16;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.*;
-
-public class Part2 {
+public class Part4 {
 
     static int n;
 
@@ -56,34 +50,18 @@ public class Part2 {
             int prevY = current[6];
 
             String state = direction + "," + x + "," + y;
-            if (costMap.containsKey(state)) {
-                if (cost == costMap.get(state)) {
-                    backtracking.put(state, prevDir + "," + prevX + "," + prevY);
-                }
+            if (costMap.containsKey(state) && costMap.get(state) <= cost) {
                 continue;
             }
-
-            String newState = "";
-            for (int newDirection = 0; newDirection < 4; newDirection++) {
-                newState = Arrays.toString(directions[newDirection]) + "," + x + "," + y;
-                if (costMap.containsKey(newState)) {
-                    break;
-                }
-                backtracking.put(state, prevDir + "," + prevX + "," + prevY);
-            }
-
             costMap.put(state, cost);
+            backtracking.put(state, prevDir + "," + prevX + "," + prevY);
 
-            if (grid[x].charAt(y) == '#') {
-                continue;
-            }
 
             if (grid[x].charAt(y) == 'E') {
                 System.out.println("Shortest Cost: " + cost);
                 endState = state;
                 break;
             }
-
 
             // Move forward in the same direction
             int newX = x + directions[direction][0];
@@ -96,10 +74,6 @@ public class Part2 {
             queue.add(new int[]{cost + 1000, (direction + 1) % 4, x, y, direction, x, y});
             // Turn left
             queue.add(new int[]{cost + 1000, (direction + 3) % 4, x, y, direction, x, y});
-
-
-
-
         }
 
         // Trace back the path
@@ -123,7 +97,11 @@ public class Part2 {
                 stack.push(prevState);
             }
         }
-        System.out.println("Answer: " + seenPositions.size());
+        System.out.println("Number of unique positions: " + seenPositions.size());
+
+
+
+
 
 
 
