@@ -32,7 +32,6 @@ public class Part1 {
         }
         br.close();
 
-
         int count = 0;
         for (String design : designs) {
             if (isValidDesign(design, patterns, new HashMap<>())) {
@@ -40,7 +39,6 @@ public class Part1 {
                 count++;
             }
         }
-
         System.out.println("Answer: " + count);
     }
 
@@ -59,7 +57,6 @@ public class Part1 {
 
                 String remaining = design.substring(pattern.length());
                 boolean result = isValidDesign(remaining, patterns, memoization);
-
                 memoization.put(remaining, result);
 
                 if (result) return true;
