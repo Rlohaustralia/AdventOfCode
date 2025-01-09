@@ -1,48 +1,60 @@
 package Day23;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
+import java.io.*;
 
 
 public class Part1 {
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader("src/Day22/input.txt"));
+        // Reading input
+        BufferedReader br = new BufferedReader(new FileReader("src/Day23/input.txt"));
+        List<String> lines = new ArrayList<>();
         String line;
-
-        List<String> list = new ArrayList<>();
         while ((line = br.readLine()) != null) {
-            list.add(line);
+            lines.add(line.trim());
         }
-        System.out.println("Original list size: " + list.size());
+        br.close();
 
-        // Remove duplicated ones first
-        // kh-tc AND tc-kh are same
-        List<String> newList = removeDuplicates(list);
-        System.out.println("New list size: " + newList.size());
-
-    }
-
-
-
-
-    private static List<String> removeDuplicates(List<String> list) {
-        List<String> newList = new ArrayList<>();
-        HashSet<String> originalCombination = new HashSet<>();
-        for (int i = 0; i < list.size(); i++) {
-            String[] str = list.get(i).split("-");
-            String left = str[0];
-            String right= str[1];
-            String reversed = left + right;
-            if (originalCombination.contains(reversed)) {
-                continue;
+        // Create adjacency list
+        // {gf=[ud], ud=[gf]}
+        Map<String, List<String>> adj = new HashMap<>();
+        for (String str : lines) {
+            String[] parts = str.split("-");
+            String left = parts[0];
+            String right = parts[1];
+            if (!adj.containsKey(left)) {
+                adj.put(left, new ArrayList<>());
             }
-            originalCombination.add(left + "," + right);
-            newList.add(left + "," + right);
+            adj.get(left).add(right);
+
+            if (!adj.containsKey(right)) {
+                adj.put(right, new ArrayList<>());
+            }
+            adj.get(right).add(left);
         }
-        return newList;
+
+        // Find interconnections
+        Set<List<String>> interConnections = new HashSet<>();
+        for (String key : adj.keySet()) {
+            for (String i : adj.get(key)) {
+                for (String j : adj.get(key)) {
+                    if (adj.get(i).contains(j)) {
+                        List<String> connected = new ArrayList<>(Arrays.asList(key, i, j));
+                        Collections.sort(connected);
+                        interConnections.add(connected);
+                    }
+                }
+            }
+        }
+
+
+        // Count if containing 't'
+        int ans = 0;
+        for (List<String> connections : interConnections) {
+            if (connections.get(0).startsWith("t") || connections.get(1).startsWith("t") || connections.get(2).startsWith("t")) {
+                ans++;
+            }
+        }
+
+        System.out.println(ans);
     }
 }
